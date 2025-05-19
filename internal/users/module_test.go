@@ -5,7 +5,7 @@ import (
 	"easymvp_api/internal/app"
 	"easymvp_api/internal/log"
 	"easymvp_api/internal/tests"
-	"easymvp_api/internal/users/entries"
+	"easymvp_api/internal/users/entities"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 	"testing"
@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 
 func NewTestContext(t *testing.T) context.Context {
 	ctx := context.Background()
-	user := &entries.User{
+	user := &entities.User{
 		Username: "testuser",
 		Password: "password",
 	}

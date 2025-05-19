@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"go.uber.org/fx"
 	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"os"
 	"strconv"
 )
@@ -52,10 +53,11 @@ var Module = fx.Options(
 	fx.Provide(
 		database.NewDB, database.NewPGX, database.NewEntityRegistry, NewDBConfig, database.NewGormLogger,
 	),
-	fx.Invoke(func(lifecycle fx.Lifecycle, registry *database.ModelRegistry) {
+	fx.Invoke(func(lifecycle fx.Lifecycle, registry *database.ModelRegistry, db *gorm.DB) {
 		lifecycle.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
 				if app.GetGoEnv() == app.GoEvnTest {
+					//db.Exec("CREATE DATABASE test;")
 					err := registry.Migrate()
 					if err != nil {
 						return err

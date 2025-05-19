@@ -2,7 +2,7 @@ package users
 
 import (
 	"context"
-	"easymvp_api/internal/users/entries"
+	"easymvp_api/internal/users/entities"
 	"errors"
 	"fmt"
 	"github.com/duke-git/lancet/v2/xerror"
@@ -18,8 +18,8 @@ func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{db: db}
 }
 
-func (s *UserService) Get(ctx context.Context, id string) (*entries.User, error) {
-	var user *entries.User
+func (s *UserService) Get(ctx context.Context, id string) (*entities.User, error) {
+	var user *entities.User
 	if err := s.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, xerror.New("missing user")
@@ -29,7 +29,7 @@ func (s *UserService) Get(ctx context.Context, id string) (*entries.User, error)
 	return user, nil
 }
 
-func (s *UserService) Save(ctx context.Context, user *entries.User) error {
+func (s *UserService) Save(ctx context.Context, user *entities.User) error {
 	if user == nil {
 		return xerror.New("user is nil")
 	}

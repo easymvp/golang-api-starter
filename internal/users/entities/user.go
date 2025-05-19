@@ -1,8 +1,8 @@
-package entries
+package entities
 
 // User ...
 type User struct {
-	ID       string `gorm:"column:id"`
+	ID       string `gorm:"column:id;primaryKey"`
 	Username string `gorm:"column:username"`
 	Password string `gorm:"column:password"`
 }

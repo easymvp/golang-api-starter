@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	"go.uber.org/fx"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"time"
 )
@@ -16,25 +17,34 @@ func NewDB(
 	cfg *DBConfig,
 	GormLogger GormLogger,
 ) *gorm.DB {
-	sqlDB, err := sql.Open(cfg.Driver, cfg.Url)
-	if err != nil {
-		panic(err.Error())
+	if cfg.Driver == "postgres" {
+		sqlDB, err := sql.Open(cfg.Driver, cfg.Url)
+		if err != nil {
+			panic(err.Error())
+		}
+		sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
+		sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
+		sqlDB.SetConnMaxLifetime(time.Duration(cfg.ConnMaxLife) * time.Second)
+		gormDB, err := gorm.Open(postgres.New(postgres.Config{
+			Conn: sqlDB,
+		}), &gorm.Config{
+			Logger: GormLogger,
+		})
+		if err != nil {
+			panic(err.Error())
+		}
+		return gormDB
+
+	} else if cfg.Driver == "sqlite3" {
+		db, err := gorm.Open(sqlite.Open(cfg.Url), &gorm.Config{})
+		if err != nil {
+			panic(err.Error())
+		}
+		return db
+	} else {
+		panic("not support database")
 	}
 
-	gormDB, err := gorm.Open(postgres.New(postgres.Config{
-		Conn: sqlDB,
-	}), &gorm.Config{
-		Logger: GormLogger,
-	})
-	if err != nil {
-		panic(err.Error())
-	}
-
-	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
-	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
-	sqlDB.SetConnMaxLifetime(time.Duration(cfg.ConnMaxLife) * time.Second)
-
-	return gormDB
 }
 
 func NewPGX(

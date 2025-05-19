@@ -2,7 +2,7 @@ package users
 
 import (
 	"context"
-	"easymvp_api/internal/users/entries"
+	"easymvp_api/internal/users/entities"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -12,7 +12,7 @@ func TestUserService_Get(t *testing.T) {
 	mockApp.Reset()
 
 	// create user
-	user := &entries.User{
+	user := &entities.User{
 		Username: "testuser",
 		Password: "password",
 	}

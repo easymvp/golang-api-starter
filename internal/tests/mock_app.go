@@ -44,22 +44,7 @@ func (s *TestApp) Reset() error {
 	if err != nil {
 		return err
 	}
-	query := `
-			DO
-			$$
-			DECLARE
-				table_name text;
-			BEGIN
-				FOR table_name IN
-					SELECT table_name
-					FROM information_schema.tables AS tables
-					WHERE tables.table_schema = 'public' AND tables.table_type = 'BASE TABLE'
-				LOOP
-					EXECUTE format('DELETE FROM %I;', table_name);
-				END LOOP;
-			END
-			$$;
-	`
+	query := `TRUNCATE SCHEMA public AND COMMIT;`
 
 	_, err = db.Exec(query)
 	return err
