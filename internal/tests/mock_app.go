@@ -20,6 +20,7 @@ type TestApp struct {
 }
 
 func NewTestApp(options ...fx.Option) *TestApp {
+	app.LoadEnv()
 	os.Setenv("GO_ENV", "TEST")
 	return &TestApp{
 		options: options,

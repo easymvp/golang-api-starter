@@ -1,6 +1,23 @@
 info:
   contact: {}
-paths: {}
+paths:
+  /api/health-check:
+    get:
+      consumes:
+      - application/json
+      description: Returns a status message indicating the service is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Service is running
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check endpoint
+      tags:
+      - health
 securityDefinitions:
   BearerAuth:
     in: header

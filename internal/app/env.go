@@ -1,7 +1,11 @@
 package app
 
 import (
+	"fmt"
+	"github.com/duke-git/lancet/v2/xerror"
+	"github.com/joho/godotenv"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -22,4 +26,30 @@ func GetGoEnv() Env {
 		return GoEvnDev
 	}
 	return Env(goEnv)
+}
+
+func LoadEnv() {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	for {
+		envPath := filepath.Join(dir, ".env")
+		if _, err := os.Stat(envPath); err == nil {
+			break
+		}
+		parentDir := filepath.Dir(dir)
+		if parentDir == dir {
+			// Reached the root directory
+			break
+		}
+		dir = parentDir
+	}
+
+	envFile := filepath.Join(dir, ".env")
+	err = godotenv.Load(envFile)
+	fmt.Println("using env", envFile)
+	if err != nil {
+		panic(xerror.Wrap(err, fmt.Sprintf("Error loading .env file from %s", dir)))
+	}
 }

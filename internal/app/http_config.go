@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	HTTPHost       = "HTTPHost"
-	HTTPPort       = "HTTPPort"
-	HTTPJwtSecret  = "HTTPJwtSecret"
-	HTTPJwtRealm   = "HTTPJwtRealm"
-	HTTPJwtExpire  = "HTTPJwtExpire"
-	HTTPJwtRefresh = "HTTPJwtRefresh"
+	HTTPHost       = "HTTP_HOST"
+	HTTPPort       = "HTTP_PORT"
+	HTTPJwtSecret  = "HTTP_JWT_SECRET"
+	HTTPJwtRealm   = "HTTP_JWT_REALM"
+	HTTPJwtExpire  = "HTTP_JWT_EXPIRE"
+	HTTPJwtRefresh = "HTTP_JWT_REFRESH"
 )
 
 type HTTPConfig struct {

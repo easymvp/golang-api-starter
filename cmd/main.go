@@ -22,6 +22,8 @@ func main() {
 	loc, _ := time.LoadLocation("UTC")
 	time.Local = loc
 
+	app.LoadEnv()
+
 	server := fx.New(
 		log.Module, // NOTE: comment out this line to use other zap logger
 		fx.WithLogger(func(logger *zap.Logger) fxevent.Logger {

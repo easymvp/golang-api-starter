@@ -44,7 +44,7 @@ var Module = fx.Module("web",
 	fx.Provide(NewWebApp, NewHttpConfig, NewJwtConfig),
 	fx.Provide(handlers.NewHealthCheckHandler),
 	fx.Invoke(func(s *App, handler *handlers.HealthCheckHandler) {
-		s.NoAuth.GET("/health", handler.HealthCheck())
+		s.NoAuth.GET("/api/health-check", handler.HealthCheck())
 	}),
 	fx.Provide(NewUserProvider),
 	fx.Provide(NewWorkspaceProvider),
