@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/duke-git/lancet/v2/xerror"
 	"github.com/gin-contrib/cors"
@@ -10,6 +11,8 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -31,10 +34,7 @@ func NewWebApp(
 	DB *gorm.DB,
 	httpConfig *HTTPConfig,
 ) *App {
-	err := godotenv.Load()
-	if err != nil {
-		panic(xerror.Wrap(err, "Error loading .env file"))
-	}
+	LoadEnv()
 
 	g := gin.Default()
 	_ = g.SetTrustedProxies(nil)
@@ -54,6 +54,32 @@ func NewWebApp(
 	}
 	s.Init()
 	return s
+}
+
+func LoadEnv() {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	for {
+		envPath := filepath.Join(dir, ".env")
+		if _, err := os.Stat(envPath); err == nil {
+			break
+		}
+		parentDir := filepath.Dir(dir)
+		if parentDir == dir {
+			// Reached the root directory
+			break
+		}
+		dir = parentDir
+	}
+
+	envFile := filepath.Join(dir, ".env")
+	err = godotenv.Load(envFile)
+	fmt.Println("using env", envFile)
+	if err != nil {
+		panic(xerror.Wrap(err, fmt.Sprintf("Error loading .env file from %s", dir)))
+	}
 }
 
 func (s *App) Run(addr string) error {
