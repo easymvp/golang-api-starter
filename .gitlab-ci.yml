@@ -1,0 +1,40 @@
+image: docker:stable
+
+variables:
+  DOCKER_DRIVER: overlay2
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  DOCKER_TLS_CERTDIR: ""
+
+
+services:
+  - docker:dind
+
+stages:
+  - test
+  - build
+  - deploy
+
+lint:
+  image: golangci/golangci-lint:v1.51.0
+  stage: test
+  before_script:
+    - cp .env.testing.gitlab-ci .env.testing
+    - go install github.com/swaggo/swag/cmd/swag@v1.8.10
+    - swag init -g cmd/main.go
+  script:
+    - golangci-lint run
+
+build:
+  tags:
+    - dind
+    - docker
+  stage: build
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - cp deploy/Dockerfile .
+    - docker build
+      --build-arg WEB_PRIVATE_KEY="$WEB_PRIVATE_KEY"
+      --build-arg GIT_DOMAIN=$CI_SERVER_HOST
+      -t $CI_REGISTRY_IMAGE:staging .
+    - docker push $CI_REGISTRY_IMAGE:staging

@@ -1,0 +1,14 @@
+main
+.env
+.env.staging
+.env.testing
+.env.dist
+.env.prod
+.idea
+*.iml
+
+webroot
+
+config.yml
+config.prod.yml
+config.test.yml

@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  REGISTRY: docker.pkg.github.com
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    environment: PROD
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+
+      - name: Build Docker image
+        run: |
+          echo "${{ secrets.CONFIG_PRODUCTION }}" > config.production.yml
+          bash scripts/build.sh --image="${{env.REGISTRY}}/${{ github.repository }}/api:latest"
+
+      - name: Push Docker image
+        run: |
+          echo "${{ secrets.CICD_TOKEN }}" | sudo docker login ${{env.REGISTRY}} -u ${{ github.actor }} --password-stdin
+          bash scripts/push.sh --image="${{env.REGISTRY}}/${{ github.repository }}/api:latest"
+
+      - name: Build database migration Docker image
+        run: |
+          bash scripts/build-db-migration.sh --image="${{env.REGISTRY}}/${{ github.repository }}/db-migration:latest"
+
+      - name: Push database migration Docker image
+        run: |
+          echo "${{ secrets.CICD_TOKEN }}" | sudo docker login ${{env.REGISTRY}} -u ${{ github.actor }} --password-stdin
+          bash scripts/push.sh --image="${{env.REGISTRY}}/${{ github.repository }}/db-migration:latest"

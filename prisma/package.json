@@ -1,0 +1,12 @@
+{
+  "name": "db-migration",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/adapter-pg": "^5.18.0",
+    "@prisma/client": "^5.18.0",
+    "pg": "^8.13.0",
+    "prisma": "^6.0.1"
+  }
+}

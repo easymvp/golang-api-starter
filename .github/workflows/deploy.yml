@@ -1,0 +1,23 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: docker.pkg.github.com
+
+jobs:
+  manual_job:
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        run: |
+          echo -e "${{secrets.SERVER_SSH_KEY}}" > /tmp/.server.pem && chmod 600 /tmp/.server.pem
+          scp -i /tmp/.server.pem -o StrictHostKeyChecking=no scripts/deploy-api.sh  ${{vars.SERVER_USER}}@${{vars.SERVER_HOST}}:/opt/deploy-api.sh
+          ssh -i /tmp/.server.pem -o StrictHostKeyChecking=no ${{vars.SERVER_USER}}@${{vars.SERVER_HOST}} "bash -e /opt/deploy-api.sh --name=api --image=${{env.REGISTRY}}/${{ github.repository }}/api:latest --db-migration-image=${{env.REGISTRY}}/${{ github.repository }}/db-migration:latest --database-url=${{secrets.DATABASE_URL}}"
+          rm /tmp/.server.pem
+
