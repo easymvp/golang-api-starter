@@ -10,7 +10,6 @@ import (
 
 func TestUserService_Get(t *testing.T) {
 	mockApp.Reset()
-
 	// create user
 	user := &entities.User{
 		Username: "testuser",
